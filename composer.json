@@ -1,0 +1,20 @@
+{
+    "name": "011brasil/yapay",
+    "description": "",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pedro Guilherme",
+            "email": "pedro.duarte@011brasil.com.br"
+        }
+    ],
+    "require": {
+        "apimatic/unirest-php": "^4.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dev011Brasil\\": "src/"
+        }
+    }
+}
