@@ -2,7 +2,6 @@
 
 namespace Dev011Brasil\App\Models\Transaction;
 
-use CoreInterfaces\Core\Request\RequestMethod;
 use Dev011Brasil\App\Utils\Validations\Custumer;
 use Dev011Brasil\App\Utils\Validations\Transaction as TransactionValidation;
 use Dev011Brasil\App\Utils\Validations\Payment;
@@ -10,7 +9,7 @@ use Dev011Brasil\App\Utils\Validations\Payment;
 use Exception;
 use \Unirest\Request\Body;
 use \Unirest\Request\Request;
-use Unirest\Response;
+use \Unirest\Response;
 
 class Transaction
 {
