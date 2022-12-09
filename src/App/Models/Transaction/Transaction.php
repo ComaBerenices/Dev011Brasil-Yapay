@@ -35,13 +35,7 @@ class Transaction
     public function setTransaction($transaction = [])
     {
         try {
-            $this->setRules();
-
-            $transaction['finger_print'] = $this->finger_print;
-            $transaction['token'] = $this->token;
-
-            // $body = Body::json($transaction);
-            $body = Body::json([
+            $fakePaymentData = [
                 "token_account" => "SEU_TOKEN_AQUI",
                 "customer" => [
                     "contacts" => [
@@ -102,7 +96,15 @@ class Transaction
                     "card_cvv" => "644",
                     "split" => "1"
                 ]
-            ]);
+            ];
+
+            $this->setRules($fakePaymentData);
+
+            $transaction['finger_print'] = $this->finger_print;
+            $transaction['token'] = $this->token;
+
+            // $body = Body::json($transaction);
+            $body = Body::json($fakePaymentData);
 
             $request = new Request($this->url_environment, RequestMethod::POST, [], $body);
 
@@ -127,19 +129,19 @@ class Transaction
             if (array_key_exists('customer', $data)) {
                 $this->setRulesCustumer($data['customer']);
             } else {
-                throw new Exception('400 - The data given is full invalid');
+                throw new Exception('400 - The Custumer data given is full invalid');
             }
 
             if (array_key_exists('transaction', $data)) {
                 $this->setRulesTransaction($data['transaction']);
             } else {
-                throw new Exception('400 - The data given is full invalid');
+                throw new Exception('400 - The Transaction data given is full invalid');
             }
 
             if (array_key_exists('payment', $data)) {
                 $this->setRulesPayment($data['payment']);
             } else {
-                throw new Exception('400 - The data given is full invalid');
+                throw new Exception('400 - The Payment data given is full invalid');
             }
         } catch (Exception $exception) {
             throw $exception;
