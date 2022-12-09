@@ -73,9 +73,11 @@ class Custumer
     static function birthDate($data = "")
     {
         try {
+            $reg = '~(0[1-9]|[12][0-9]|3[01])[-/](0[1-9]|1[012])[-/](19|20)\d\d~';
+
             if ($data === "" || $data <= 0) throw new Exception('Custumer 005 - The birth date value is invalid, string or number is accepted');
 
-            if (!preg_match('/{2}\/{2}\/{4}/', $data))  throw new Exception('Custumer 006 - The BIRTH DATE is not valid');
+            if (!preg_match($reg, $data))  throw new Exception('Custumer 006 - The BIRTH DATE is not valid');
         } catch (Exception $exception) {
             throw $exception;
         }
