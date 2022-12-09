@@ -91,8 +91,8 @@ class Transaction
                     "payment_method_id" => "3",
                     "card_name" => "STEPHEN STRANGE",
                     "card_number" => "4111111111111111",
-                    "card_expdate_month" => "01",
-                    "card_expdate_year" => "2021",
+                    "card_expdate_month" => "12",
+                    "card_expdate_year" => "2022",
                     "card_cvv" => "644",
                     "split" => "1"
                 ]
@@ -172,35 +172,39 @@ class Transaction
             }
 
             if (array_key_exists('contacts', $data) && (is_array($data['contacts']) && count($data['contacts']) > 0)) {
-                foreach ($data['contacts'] as $field => $value) {
-                    switch ($field) {
-                        case 'type_contact':
-                            Custumer::contactType($value);
-                            break;
-                        case 'number_contact':
-                            Custumer::contactNumber($value);
-                            break;
-                        default:
+                foreach ($data['contacts'] as $contacts) {
+                    foreach ($contacts as $field => $value) {
+                        switch ($field) {
+                            case 'type_contact':
+                                Custumer::contactType($value);
+                                break;
+                            case 'number_contact':
+                                Custumer::contactNumber($value);
+                                break;
+                            default:
+                        }
                     }
                 }
             }
 
             if (array_key_exists('addresses', $data) && (is_array($data['addresses']) && count($data['addresses']) > 0)) {
-                foreach ($data['addresses'] as $field => $value) {
-                    switch ($field) {
-                        case 'postal_code':
-                            Custumer::postalCode($value);
-                            break;
-                        case 'street':
-                            Custumer::street($value);
-                            break;
-                        case 'state':
-                            Custumer::state($value);
-                            break;
-                        case 'number':
-                            Custumer::number($value);
-                            break;
-                        default:
+                foreach ($data['addresses'] as $address) {
+                    foreach ($address as $field => $value) {
+                        switch ($field) {
+                            case 'postal_code':
+                                Custumer::postalCode($value);
+                                break;
+                            case 'street':
+                                Custumer::street($value);
+                                break;
+                            case 'state':
+                                Custumer::state($value);
+                                break;
+                            case 'number':
+                                Custumer::number($value);
+                                break;
+                            default:
+                        }
                     }
                 }
             }
