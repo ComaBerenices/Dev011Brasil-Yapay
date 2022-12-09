@@ -57,7 +57,7 @@ class Custumer
     static function email($data = "")
     {
         try {
-            if ($data === "" || $data <= 0) throw new Exception('Custumer 004 - The EMAIL value is invalid, string or number is accepted');
+            if ($data === "") throw new Exception('Custumer 004 - The EMAIL value is invalid, string or number is accepted');
 
             if (!filter_var($data, FILTER_VALIDATE_EMAIL))  throw new Exception('Custumer 005 - The EMAIL is not valid');
         } catch (Exception $exception) {
@@ -91,9 +91,9 @@ class Custumer
     static function contactType($data = "")
     {
         try {
-            if ($data === "" || $data <= 0) throw new Exception('Custumer 006 - The type_contact value is invalid, string or number is accepted');
+            if ($data === "") throw new Exception('Custumer 006 - The type_contact value is invalid, string or number is accepted');
 
-            if ($data !== 'H' || $data !== 'M' || $data !== 'W')  throw new Exception('Custumer 007 - The type_contact is not valid');
+            if ($data !== 'H' && $data !== 'M' && $data !== 'W')  throw new Exception('Custumer 007 - The type_contact is not valid');
         } catch (Exception $exception) {
             throw $exception;
         }
@@ -127,7 +127,9 @@ class Custumer
         try {
             if ($data === "" || $data <= 0) throw new Exception('Custumer 009 - The postal code value is invalid, string or number is accepted');
 
-            if (strlen($data) > 8)  throw new Exception('Custumer 010 - The POSTAL CODE is not valid code, max 10 characters');
+            $postalCode = preg_replace('/[^0-9]/', '', $data);
+
+            if (strlen($postalCode) > 8)  throw new Exception('Custumer 010 - The POSTAL CODE is not valid code, max 10 characters');
         } catch (Exception $exception) {
             throw $exception;
         }
@@ -141,9 +143,9 @@ class Custumer
     static function street($data = "")
     {
         try {
-            if ($data === "" || $data <= 0) throw new Exception('Custumer 010 - The street value is invalid, string or number is accepted');
+            if ($data === "") throw new Exception('Custumer 010 - The street value is invalid, string or number is accepted');
 
-            $streetData = preg_replace('/[^a-Z]/', '', $data);
+            $streetData = preg_replace('/[^a-z][^A-Z]/', '', $data);
 
             if (is_numeric($streetData))  throw new Exception('Custumer 011 - The STREET is not valid text, number is not allowed');
         } catch (Exception $exception) {
@@ -159,7 +161,7 @@ class Custumer
     static function state($data = "")
     {
         try {
-            if ($data === "" || $data <= 0) throw new Exception('Custumer 012 - The state value is invalid, string or number is accepted');
+            if ($data === "") throw new Exception('Custumer 012 - The state value is invalid, string or number is accepted');
 
             if (strlen($data) > 2)  throw new Exception('Custumer 013 - The STATE is not valid number, min 1 and max 2 characters');
         } catch (Exception $exception) {

@@ -17,9 +17,9 @@ class Payment
     static function cardName($data = "")
     {
         try {
-            if ($data === "" || $data <= 0) throw new Exception('Payment 001 - The card name value is invalid, string or number is accepted');
+            if ($data === "") throw new Exception('Payment 001 - The card name value is invalid, string or number is accepted');
 
-            $cardName = preg_replace('/[^a-Z]/', '', $data);
+            $cardName = preg_replace('/[^a-z][^A-Z]/', '', $data);
 
             if (is_numeric($cardName))  throw new Exception('Payment 002 - The CARD NAME is not valid text, number is not allowed');
         } catch (Exception $exception) {
@@ -53,9 +53,11 @@ class Payment
     static function cardExpdateMonth($data = "")
     {
         try {
-            if ($data === "" || $data <= 0) throw new Exception('Payment 003 - The card month value is invalid, string or number is accepted');
+            $mounth = (int)$data;
 
-            if ((int)$data < (int)date("m"))  throw new Exception('Payment 004 - The CARD MONTH is not valid mounth, should be then or equal that ' . date('m'));
+            if ($mounth === "" || $mounth <= 0) throw new Exception('Payment 003 - The card month value is invalid, string or number is accepted');
+
+            if ($mounth < (int)date("m"))  throw new Exception('Payment 004 - The CARD MONTH is not valid mounth, should be then or equal that ' . date('m'));
         } catch (Exception $exception) {
             throw $exception;
         }
@@ -103,7 +105,7 @@ class Payment
 
             $paymentMethodID = (int)$data;
 
-            if (!array_search($data, self::$PAYMENT_METHOD_ID, true)) throw new Exception('Payment 007 - The payment method is not valid');
+            if (!array_search($paymentMethodID, self::$PAYMENT_METHOD_ID, true)) throw new Exception('Payment 007 - The payment method is not valid');
         } catch (Exception $exception) {
             throw $exception;
         }
