@@ -19,8 +19,11 @@ class Transaction implements Parser
     protected $finger_print = null;
     protected $url_environment = null;
     protected $httpClient = null;
+
+    // SUPPORT TO LEGACY APPLICATIONS
     protected $message = "";
     protected $code = "";
+    protected $tid = null;
 
     public function __construct($token, $finger_print, $url_environment)
     {
@@ -141,6 +144,7 @@ class Transaction implements Parser
             if (!$messageErrorResponse) {
                 $this->message = $messageErrorResponse;
                 $bodyResponseParsed = $this->getBodyResponse($bodyResponse);
+                $this->tid = $bodyResponse['tid'] ?? -1;
             }
 
             $this->code = $codeResponse;
@@ -584,6 +588,24 @@ class Transaction implements Parser
                     $responseParsed['url_payment'] = $bodyResponse->data_response->transaction->payment->url_payment ?? '';
                     $responseParsed['payment']  = 'Boleto';
                     break;
+                case 3:
+                    $responseParsed['tid'] = $bodyResponse->data_response->transaction->payment->tid ?? -1;
+                    break;
+                case 4:
+                    $responseParsed['tid'] = $bodyResponse->data_response->transaction->payment->tid ?? -1;
+                    break;
+                case 5:
+                    $responseParsed['tid'] = $bodyResponse->data_response->transaction->payment->tid ?? -1;
+                    break;
+                case 16:
+                    $responseParsed['tid'] = $bodyResponse->data_response->transaction->payment->tid ?? -1;
+                    break;
+                case 20:
+                    $responseParsed['tid'] = $bodyResponse->data_response->transaction->payment->tid ?? -1;
+                    break;
+                case 25:
+                    $responseParsed['tid'] = $bodyResponse->data_response->transaction->payment->tid ?? -1;
+                    break;
                 default:
                     //
             }
@@ -602,6 +624,18 @@ class Transaction implements Parser
         }
     }
 
+    /**
+     * THE FUNCTIONS BELOW IS ONLY SUPPORT TO LEGACY APPLICATIONS
+     */
+    private function getPaymentCode($code)
+    {
+        try {
+            return $this->code;
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+
     private function getReturnCode($code)
     {
         try {
@@ -615,6 +649,24 @@ class Transaction implements Parser
     {
         try {
             return $this->message;
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    private function paymentMessage($message)
+    {
+        try {
+            return $this->message;
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    private function getPaymentTID($message)
+    {
+        try {
+            return $this->tid;
         } catch (Exception $exception) {
             throw $exception;
         }
