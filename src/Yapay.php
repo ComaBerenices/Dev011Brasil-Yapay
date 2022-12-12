@@ -61,7 +61,7 @@ class Yapay
         }
     }
 
-    public function refundByID($body = [])
+    public function refundByID($transactionID = -1)
     {
         try {
             if (!$this->finger_print) throw  new Exception('403 - This request is not Authorized, your fingir print is missing');
@@ -69,7 +69,7 @@ class Yapay
 
             $transaction = new Transaction($this->token, $this->finger_print, $this->url_environment);
 
-            return $transaction->refundByID($body);
+            return $transaction->refundByID($transactionID);
         } catch (Exception $exception) {
             throw $exception;
         }

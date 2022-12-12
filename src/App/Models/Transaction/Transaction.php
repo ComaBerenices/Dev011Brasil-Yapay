@@ -176,7 +176,7 @@ class Transaction implements Parser
 
             $response = $this->httpClient->execute($request);
 
-            if (!$response) throw new Exception("Something don't work correctly");
+            if (!$response) throw new Exception("Something don't work correctly,the request or response is invalid");
 
             $bodyResponse = $response->getBody();
             $bodyStatusCodeResponse = $response->getStatusCode();
@@ -359,179 +359,179 @@ class Transaction implements Parser
             $code = -1;
 
             switch ($codeError) {
-                case '00';
+                case '00':
                     $code = '00';
                     $message = 'APROVADA. TRANSACAO EXECUTADA COM SUCESSO';
                     break;
-                case '01';
+                case '01':
                     $code = '01';
                     $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-01]';
                     break;
-                case '12';
+                case '12':
                     $code = '12';
                     $message = 'PARCELAMENTO INVALIDO - NAO TENTE NOVAMENTE [ECOM-12]';
                     break;
-                case '64';
+                case '64':
                     $code = '64';
                     $message = 'VALOR DA TRANSACAO NAO PERMITIDO - NAO TENTE NOVAMENTE [ECOM-64]';
                     break;
-                case '76';
+                case '76':
                     $code = '76';
                     $message = 'CONTA DESTINO INVALIDA - NAO TENTE NOVAMENTE [ECOM-76]';
                     break;
-                case '912';
+                case '912':
                     $code = '912';
                     $message = 'FALHA DE COMUNICACAO - TENTE MAIS TARDE [ECOM-912]';
                     break;
-                case '911';
+                case '911':
                     $code = '911';
                     $message = 'FALHA DE COMUNICACAO - TENTE MAIS TARDE [ECOM-911]';
                     break;
-                case '04';
+                case '04':
                     $code = '04';
                     $message = 'REFAZER A TRANSACAO [ECOM-04]';
                     break;
-                case '06';
+                case '06':
                     $code = '06';
                     $message = 'LOJISTA CONTATE O ADQUIRENTE [ECOM-06]';
                     break;
-                case 'R1';
+                case 'R1':
                     $code = 'R1';
                     $message = 'SUSPENSAO DE PAGAMENTO RECORRENTE PARA SERVICO - NAO TENTE NOVAMENTE [ECOM-R1]';
                     break;
-                case '100';
+                case '100':
                     $code = '100';
                     $message = 'CONTATE A CENTRAL DO SEU CARTAO [ECOM-100]';
                     break;
-                case '101';
+                case '101':
                     $code = '101';
                     $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-101]';
                     break;
-                case '106';
+                case '106':
                     $code = '106';
                     $message = 'EXCEDIDAS TENTATIVAS DE SENHA. CONTATE A CENTRAL DO SEU CARTAO [ECOM-106]';
                     break;
-                case '109';
+                case '109':
                     $code = '109';
                     $message = 'TRANSACAO NAO PERMITIDA - NAO TENTE NOVAMENTE [ECOM-109]';
                     break;
-                case '110';
+                case '110':
                     $code = '110';
                     $message = 'VALOR DA TRANSACAO NAO PERMITIDO - NAO TENTE NOVAMENTE [ECOM-110]';
                     break;
-                case '115';
+                case '115':
                     $code = '115';
                     $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-115]';
                     break;
-                case '116';
+                case '116':
                     $code = '116';
                     $message = 'NAO AUTORIZADA [ECOM-116]';
                     break;
-                case '117';
+                case '117':
                     $code = '117';
                     $message = 'SENHA INVALIDA [ECOM-117]';
                     break;
-                case '122';
+                case '122':
                     $code = '122';
                     $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-122]';
                     break;
-                case '03';
+                case '03':
                     $code = '03';
                     $message = 'TRANSACAO NAO PERMITIDA - NAO TENTE NOVAMENTE [ECOM-03]';
                     break;
-                case '43';
+                case '43':
                     $code = '43';
                     $message = 'TRANSACAO NAO PERMITIDA - NAO TENTE NOVAMENTE [ECOM-43]';
                     break;
-                case '05';
+                case '05':
                     $code = '05';
                     $message = 'CONTATE A CENTRAL DO SEU CARTAO [ECOM-05]';
                     break;
-                case '05';
+                case '05':
                     $code = '05';
                     $message = 'CONTATE A CENTRAL DO SEU CARTAO [ECOM-05]';
                     break;
-                case '07';
+                case '07':
                     $code = '07';
                     $message = 'TRANSACAO NAO PERMITIDA PARA O CARTAO - NAO TENTE NOVAMENTE [ECOM-07]';
                     break;
-                case '12';
+                case '12':
                     $code = '12';
                     $message = 'ERRO NO CARTAO – NAO TENTE NOVAMENTE [ECOM-12]';
                     break;
-                case '13';
+                case '13':
                     $code = '13';
                     $message = 'VALOR DA TRANSACAO NAO PERMITIDO - NAO TENTE NOVAMENTE [ECOM-13]';
                     break;
-                case '14';
+                case '14':
                     $code = '14';
                     $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-14]';
                     break;
-                case '19';
+                case '19':
                     $code = '19';
                     $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-14]';
                     break;
-                case '23';
+                case '23':
                     $code = '23';
                     $message = 'PARCELAMENTO INVALIDO - NAO TENTE NOVAMENTE [ECOM-23]';
                     break;
-                case '30';
+                case '30':
                     $code = '30';
                     $message = 'ERRO NO CARTAO – NAO TENTE NOVAMENTE [ECOM-30]';
                     break;
-                case '38';
+                case '38':
                     $code = '38';
                     $message = 'EXCEDIDAS TENTATIVAS DE SENHA. CONTATE A CENTRAL DO SEU CARTAO [ECOM-38]';
                     break;
-                case '39';
+                case '39':
                     $code = '39';
                     $message = 'UTILIZE FUNCAO DEBITO [ECOM-39]';
                     break;
-                case '41';
+                case '41':
                     $code = '41';
                     $message = 'TRANSACAO NAO PERMITIDA - NAO TENTE NOVAMENTE [ECOM-41]';
                     break;
-                case '43';
+                case '43':
                     $code = '43';
                     $message = 'TRANSACAO NAO PERMITIDA - NAO TENTE NOVAMENTE [ECOM-43]';
                     break;
-                case '53';
+                case '53':
                     $code = '53';
                     $message = 'UTILIZE FUNCAO CREDITO [ECOM-53]';
                     break;
-                case '56';
+                case '56':
                     $code = '56';
                     $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-56]';
                     break;
-                case '51';
+                case '51':
                     $code = '51';
                     $message = 'NAO AUTORIZADA [ECOM-51]';
                     break;
-                case '52';
+                case '52':
                     $code = '52';
                     $message = 'UTILIZE FUNCAO CREDITO [ECOM-52]';
                     break;
-                case '61';
+                case '61':
                     $code = '61';
                     $message = 'VALOR EXCEDIDO. CONTATE A CENTRAL DO SEU CARTAO [ECOM-61]';
                     break;
-                case '77';
+                case '77':
                     $code = '77';
                     $message = 'CONTA ORIGEM INVALIDA - NAO TENTE NOVAMENTE [ECOM-77]';
                     break;
-                case '77';
+                case '77':
                     $code = '77';
                     $message = 'CONTA ORIGEM INVALIDA - NAO TENTE NOVAMENTE [ECOM-77]';
                     break;
-                case '200';
+                case '200':
                     $code = '200';
                     $message = 'TRANSACAO NAO PERMITIDA PARA O CARTAO - NAO TENTE NOVAMENTE [ECOM-200]';
                     break;
-                case '003039';
+                case '003039':
                     $code = '003039';
                     $message = 'Vendedor inválido ou não encontrado';
                     break;
-                case '003005';
+                case '003005':
                     $code = '003005';
                     $message = 'Transação inválida ou inexistente';
                     break;
