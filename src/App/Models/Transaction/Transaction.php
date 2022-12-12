@@ -663,7 +663,7 @@ class Transaction implements Parser
         }
     }
 
-    public function getPaymentTID($message)
+    public function getPaymentTID()
     {
         try {
             return $this->tid;
