@@ -170,7 +170,7 @@ class Transaction implements Parser
                 "transaction_id" => 79717
             ]);
 
-            $request = new Request($this->url_environment, RequestMethod::POST, [], $body);
+            $request = new Request($this->url_environment, RequestMethod::PATCH, [], $body);
 
             if (!$this->httpClient) throw new Exception('Something is wrong, Try Again!');
 
