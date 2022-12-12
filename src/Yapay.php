@@ -47,7 +47,7 @@ class Yapay
         }
     }
 
-    public function transaction($body = [])
+    public function pay($body = [])
     {
         try {
             if (!$this->finger_print) throw  new Exception('403 - This request is not Authorized, your fingir print is missing');
@@ -55,7 +55,21 @@ class Yapay
 
             $transaction = new Transaction($this->token, $this->finger_print, $this->url_environment);
 
-            return $transaction->setTransaction($body);
+            return $transaction->pay($body);
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    public function refundByID($body = [])
+    {
+        try {
+            if (!$this->finger_print) throw  new Exception('403 - This request is not Authorized, your fingir print is missing');
+            if (!$this->token) throw  new Exception('403 - This request is not Authorized, your token is missing');
+
+            $transaction = new Transaction($this->token, $this->finger_print, $this->url_environment);
+
+            return $transaction->refundByID($body);
         } catch (Exception $exception) {
             throw $exception;
         }
