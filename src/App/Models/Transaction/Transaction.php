@@ -627,7 +627,7 @@ class Transaction implements Parser
     /**
      * THE FUNCTIONS BELOW IS ONLY SUPPORT TO LEGACY APPLICATIONS
      */
-    private function getPaymentCode($code)
+    public function getPaymentCode($code)
     {
         try {
             return $this->code;
@@ -636,7 +636,7 @@ class Transaction implements Parser
         }
     }
 
-    private function getReturnCode($code)
+    public function getReturnCode($code)
     {
         try {
             return $this->code;
@@ -645,7 +645,7 @@ class Transaction implements Parser
         }
     }
 
-    private function getReturnMessage($message)
+    public function getReturnMessage($message)
     {
         try {
             return $this->message;
@@ -654,7 +654,7 @@ class Transaction implements Parser
         }
     }
 
-    private function paymentMessage($message)
+    public function paymentMessage($message)
     {
         try {
             return $this->message;
@@ -663,7 +663,7 @@ class Transaction implements Parser
         }
     }
 
-    private function getPaymentTID($message)
+    public function getPaymentTID($message)
     {
         try {
             return $this->tid;
