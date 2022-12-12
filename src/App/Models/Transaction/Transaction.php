@@ -3,7 +3,7 @@
 namespace Dev011Brasil\App\Models\Transaction;
 
 use CoreInterfaces\Core\Request\RequestMethod;
-
+use Dev011Brasil\App\Models\Contracts\Error\Parser;
 use Dev011Brasil\App\Utils\Validations\Custumer;
 use Dev011Brasil\App\Utils\Validations\Transaction as TransactionValidation;
 use Dev011Brasil\App\Utils\Validations\Payment;
@@ -13,20 +13,19 @@ use \Unirest\Request\Body;
 use \Unirest\Request\Request;
 use \Unirest\Response;
 
-class Transaction
+class Transaction implements Parser
 {
-
     protected $token = null;
     protected $finger_print = null;
     protected $url_environment = null;
-    protected $httClient = null;
+    protected $httpClient = null;
 
     public function __construct($token, $finger_print, $url_environment)
     {
         $this->token = $token;
         $this->finger_print = $finger_print;
         $this->url_environment = $url_environment . 'transactions/payment';
-        $this->httClient = new \Unirest\HttpClient();
+        $this->httpClient = new \Unirest\HttpClient();
     }
 
     /**
@@ -110,16 +109,39 @@ class Transaction
 
             $request = new Request($this->url_environment, RequestMethod::POST, [], $body);
 
-            if (!$this->httClient) throw new Exception('Something is wrong, Try Again!');
+            if (!$this->httpClient) throw new Exception('Something is wrong, Try Again!');
 
-            $response = $this->httClient->execute($request);
+            $response = $this->httpClient->execute($request);
 
             if (!$response) throw new Exception("Something don't work correctly");
 
             $bodyResponse = $response->getBody();
             $bodyStatusCodeResponse = $response->getStatusCode();
+            $messageErrorResponse = null;
+            $codeResponse = "";
+            $bodyResponseParsed = [];
 
-            return ["code" => $bodyStatusCodeResponse, "data" => $bodyResponse];
+            if (array_key_exists('error_response', $bodyResponse)) {
+                $codeResponse = $bodyResponse['error_response']['general_errors'][0]['code'] ?? "-1";
+            } else if (
+                array_key_exists('data_response', $bodyResponse)
+                &&
+                array_key_exists('transaction', $bodyResponse['data_response'])
+                &&
+                array_key_exists('payment', $bodyResponse['transaction'])
+            ) {
+                $codeResponse = $bodyResponse['data_response']['transaction']['payment']['payment_response_code'] ?? "-1";
+            }
+
+            $messageErrorResponse = $this->getCodeMessage($codeResponse);
+
+            if (!$messageErrorResponse) $bodyResponseParsed = $this->getBodyResponse($bodyResponse);
+
+            return [
+                "code" => $bodyStatusCodeResponse,
+                "message" => $messageErrorResponse ?? 'Solicitação de transação efetuada',
+                "data" => $bodyResponseParsed
+            ];
         } catch (Exception $exception) {
             throw $exception;
         }
@@ -262,6 +284,243 @@ class Transaction
                     default:
                 }
             }
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    public function getCodeMessage($codeError = -1)
+    {
+        try {
+            $message = "";
+            $code = -1;
+
+            switch ($codeError) {
+                case '00';
+                    $code = '00';
+                    $message = 'APROVADA. TRANSACAO EXECUTADA COM SUCESSO';
+                    break;
+                case '01';
+                    $code = '01';
+                    $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-01]';
+                    break;
+                case '12';
+                    $code = '12';
+                    $message = 'PARCELAMENTO INVALIDO - NAO TENTE NOVAMENTE [ECOM-12]';
+                    break;
+                case '64';
+                    $code = '64';
+                    $message = 'VALOR DA TRANSACAO NAO PERMITIDO - NAO TENTE NOVAMENTE [ECOM-64]';
+                    break;
+                case '76';
+                    $code = '76';
+                    $message = 'CONTA DESTINO INVALIDA - NAO TENTE NOVAMENTE [ECOM-76]';
+                    break;
+                case '912';
+                    $code = '912';
+                    $message = 'FALHA DE COMUNICACAO - TENTE MAIS TARDE [ECOM-912]';
+                    break;
+                case '911';
+                    $code = '911';
+                    $message = 'FALHA DE COMUNICACAO - TENTE MAIS TARDE [ECOM-911]';
+                    break;
+                case '04';
+                    $code = '04';
+                    $message = 'REFAZER A TRANSACAO [ECOM-04]';
+                    break;
+                case '06';
+                    $code = '06';
+                    $message = 'LOJISTA CONTATE O ADQUIRENTE [ECOM-06]';
+                    break;
+                case 'R1';
+                    $code = 'R1';
+                    $message = 'SUSPENSAO DE PAGAMENTO RECORRENTE PARA SERVICO - NAO TENTE NOVAMENTE [ECOM-R1]';
+                    break;
+                case '100';
+                    $code = '100';
+                    $message = 'CONTATE A CENTRAL DO SEU CARTAO [ECOM-100]';
+                    break;
+                case '101';
+                    $code = '101';
+                    $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-101]';
+                    break;
+                case '106';
+                    $code = '106';
+                    $message = 'EXCEDIDAS TENTATIVAS DE SENHA. CONTATE A CENTRAL DO SEU CARTAO [ECOM-106]';
+                    break;
+                case '109';
+                    $code = '109';
+                    $message = 'TRANSACAO NAO PERMITIDA - NAO TENTE NOVAMENTE [ECOM-109]';
+                    break;
+                case '110';
+                    $code = '110';
+                    $message = 'VALOR DA TRANSACAO NAO PERMITIDO - NAO TENTE NOVAMENTE [ECOM-110]';
+                    break;
+                case '115';
+                    $code = '115';
+                    $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-115]';
+                    break;
+                case '116';
+                    $code = '116';
+                    $message = 'NAO AUTORIZADA [ECOM-116]';
+                    break;
+                case '117';
+                    $code = '117';
+                    $message = 'SENHA INVALIDA [ECOM-117]';
+                    break;
+                case '122';
+                    $code = '122';
+                    $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-122]';
+                    break;
+                case '03';
+                    $code = '03';
+                    $message = 'TRANSACAO NAO PERMITIDA - NAO TENTE NOVAMENTE [ECOM-03]';
+                    break;
+                case '43';
+                    $code = '43';
+                    $message = 'TRANSACAO NAO PERMITIDA - NAO TENTE NOVAMENTE [ECOM-43]';
+                    break;
+                case '05';
+                    $code = '05';
+                    $message = 'CONTATE A CENTRAL DO SEU CARTAO [ECOM-05]';
+                    break;
+                case '05';
+                    $code = '05';
+                    $message = 'CONTATE A CENTRAL DO SEU CARTAO [ECOM-05]';
+                    break;
+                case '07';
+                    $code = '07';
+                    $message = 'TRANSACAO NAO PERMITIDA PARA O CARTAO - NAO TENTE NOVAMENTE [ECOM-07]';
+                    break;
+                case '12';
+                    $code = '12';
+                    $message = 'ERRO NO CARTAO – NAO TENTE NOVAMENTE [ECOM-12]';
+                    break;
+                case '13';
+                    $code = '13';
+                    $message = 'VALOR DA TRANSACAO NAO PERMITIDO - NAO TENTE NOVAMENTE [ECOM-13]';
+                    break;
+                case '14';
+                    $code = '14';
+                    $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-14]';
+                    break;
+                case '19';
+                    $code = '19';
+                    $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-14]';
+                    break;
+                case '23';
+                    $code = '23';
+                    $message = 'PARCELAMENTO INVALIDO - NAO TENTE NOVAMENTE [ECOM-23]';
+                    break;
+                case '30';
+                    $code = '30';
+                    $message = 'ERRO NO CARTAO – NAO TENTE NOVAMENTE [ECOM-30]';
+                    break;
+                case '38';
+                    $code = '38';
+                    $message = 'EXCEDIDAS TENTATIVAS DE SENHA. CONTATE A CENTRAL DO SEU CARTAO [ECOM-38]';
+                    break;
+                case '39';
+                    $code = '39';
+                    $message = 'UTILIZE FUNCAO DEBITO [ECOM-39]';
+                    break;
+                case '41';
+                    $code = '41';
+                    $message = 'TRANSACAO NAO PERMITIDA - NAO TENTE NOVAMENTE [ECOM-41]';
+                    break;
+                case '43';
+                    $code = '43';
+                    $message = 'TRANSACAO NAO PERMITIDA - NAO TENTE NOVAMENTE [ECOM-43]';
+                    break;
+                case '53';
+                    $code = '53';
+                    $message = 'UTILIZE FUNCAO CREDITO [ECOM-53]';
+                    break;
+                case '56';
+                    $code = '56';
+                    $message = 'VERIFIQUE OS DADOS DO CARTAO [ECOM-56]';
+                    break;
+                case '51';
+                    $code = '51';
+                    $message = 'NAO AUTORIZADA [ECOM-51]';
+                    break;
+                case '52';
+                    $code = '52';
+                    $message = 'UTILIZE FUNCAO CREDITO [ECOM-52]';
+                    break;
+                case '61';
+                    $code = '61';
+                    $message = 'VALOR EXCEDIDO. CONTATE A CENTRAL DO SEU CARTAO [ECOM-61]';
+                    break;
+                case '77';
+                    $code = '77';
+                    $message = 'CONTA ORIGEM INVALIDA - NAO TENTE NOVAMENTE [ECOM-77]';
+                    break;
+                case '77';
+                    $code = '77';
+                    $message = 'CONTA ORIGEM INVALIDA - NAO TENTE NOVAMENTE [ECOM-77]';
+                    break;
+                case '200';
+                    $code = '200';
+                    $message = 'TRANSACAO NAO PERMITIDA PARA O CARTAO - NAO TENTE NOVAMENTE [ECOM-200]';
+                    break;
+                case '003039';
+                    $code = '003039';
+                    $message = 'Vendedor inválido ou não encontrado';
+                    break;
+                default:
+                    $message = "Something don't work";
+            }
+
+            return "$code - $message";
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    public function getBodyResponse($bodyResponse = [])
+    {
+        try {
+            if (count($bodyResponse) <= 0) throw new Exception("Transaction 174 - The response body is invalid");
+
+            $paymentMethodID = $bodyResponse['data_response']['transaction']['payment']['payment_response_code'] ?? -1;
+
+            $responseParsed = [
+                "price_payment" => 0.0,
+                "price_original" => 0.0,
+                "status_id" => 0,
+                "status_name" => "",
+                "order_number" => -1,
+                "transaction_id" => -1
+            ];
+
+            if ($paymentMethodID <= 0) throw new Exception('Transaction 175 - Payment method not found');
+
+            switch ($paymentMethodID) {
+                case 27:
+                    $responseParsed['url_payment'] = $bodyResponse['data_response']['transaction']['payment']['url_payment'] ?? '';
+                    $responseParsed['qrcode_path']  = $bodyResponse['data_response']['transaction']['payment']['qrcode_path'] ?? '';
+                    $responseParsed['qrcode_original_path']  = $bodyResponse['data_response']['transaction']['payment']['qrcode_original_path'] ?? '';
+                    $responseParsed['payment']  = 'PIX';
+
+                    break;
+                case 6:
+                    $responseParsed['url_payment'] = $bodyResponse['data_response']['transaction']['payment']['url_payment'] ?? '';
+                    $responseParsed['payment']  = 'Boleto';
+                    break;
+                default:
+                    //
+            }
+
+            $responseParsed['price_payment'] = $bodyResponse['data_response']['transaction']['payment']['price_payment'] ?? 0.0;
+            $responseParsed['price_original'] = $bodyResponse['data_response']['transaction']['payment']['price_original'] ?? 0.0;
+
+            $responseParsed['status_id'] = $bodyResponse['data_response']['transaction']['payment']['status_id'] ?? 0.0;
+            $responseParsed['status_name'] = $bodyResponse['data_response']['transaction']['payment']['status_name'] ?? 0.0;
+            $responseParsed['order_number'] = $bodyResponse['data_response']['transaction']['payment']['order_number'] ?? 0.0;
+            $responseParsed['transaction_id'] = $bodyResponse['data_response']['transaction']['payment']['transaction_id'] ?? 0.0;
+
+            return $responseParsed;
         } catch (Exception $exception) {
             throw $exception;
         }
