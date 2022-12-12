@@ -19,6 +19,8 @@ class Transaction implements Parser
     protected $finger_print = null;
     protected $url_environment = null;
     protected $httpClient = null;
+    protected $message = "";
+    protected $code = "";
 
     public function __construct($token, $finger_print, $url_environment)
     {
@@ -36,77 +38,77 @@ class Transaction implements Parser
     public function pay($transaction = [])
     {
         try {
-            $fakePaymentData = [
-                "token_account" => "SEU_TOKEN_AQUI",
-                "customer" => [
-                    "contacts" => [
-                        [
-                            "type_contact" => "H",
-                            "number_contact" => "1133221122"
-                        ],
-                        [
-                            "type_contact" => "M",
-                            "number_contact" => "11999999999"
-                        ]
-                    ],
-                    "addresses" => [
-                        [
-                            "type_address" => "B",
-                            "postal_code" => "17000-000",
-                            "street" => "Av Esmeralda",
-                            "number" => "1001",
-                            "completion" => "A",
-                            "neighborhood" => "Jd Esmeralda",
-                            "city" => "Marilia",
-                            "state" => "SP"
-                        ]
-                    ],
-                    "name" => "Stephen Strange",
-                    "birth_date" => "21/05/1941",
-                    "cpf" => "50235335142",
-                    "email" => "stephen.strange@avengers.com"
-                ],
-                "transaction_product" => [
-                    [
-                        "description" => "Camiseta Tony Stark",
-                        "quantity" => "1",
-                        "price_unit" => "130.00",
-                        "code" => "1",
-                        "sku_code" => "0001",
-                        "extra" => "Informação Extra"
-                    ]
-                ],
-                "transaction" => [
-                    "available_payment_methods" => "2,3,4,5,6,7,14,15,16,18,19,21,22,23",
-                    "customer_ip" => "127.0.0.1",
-                    "shipping_type" => "Sedex",
-                    "shipping_price" => "12",
-                    "price_discount" => "",
-                    "url_notification" => "http://www.loja.com.br/notificacao",
-                    "free" => "Campo Livre"
-                ],
-                "transaction_trace" => [
-                    "estimated_date" => "02/04/2022"
-                ],
-                "payment" => [
-                    "payment_method_id" => "3",
-                    "card_name" => "STEPHEN STRANGE",
-                    "card_number" => "4111111111111111",
-                    "card_expdate_month" => "12",
-                    "card_expdate_year" => "2022",
-                    "card_cvv" => "644",
-                    "split" => "1"
-                ]
-            ];
+            // $fakePaymentData = [
+            //     "token_account" => "SEU_TOKEN_AQUI",
+            //     "customer" => [
+            //         "contacts" => [
+            //             [
+            //                 "type_contact" => "H",
+            //                 "number_contact" => "1133221122"
+            //             ],
+            //             [
+            //                 "type_contact" => "M",
+            //                 "number_contact" => "11999999999"
+            //             ]
+            //         ],
+            //         "addresses" => [
+            //             [
+            //                 "type_address" => "B",
+            //                 "postal_code" => "17000-000",
+            //                 "street" => "Av Esmeralda",
+            //                 "number" => "1001",
+            //                 "completion" => "A",
+            //                 "neighborhood" => "Jd Esmeralda",
+            //                 "city" => "Marilia",
+            //                 "state" => "SP"
+            //             ]
+            //         ],
+            //         "name" => "Stephen Strange",
+            //         "birth_date" => "21/05/1941",
+            //         "cpf" => "50235335142",
+            //         "email" => "stephen.strange@avengers.com"
+            //     ],
+            //     "transaction_product" => [
+            //         [
+            //             "description" => "Camiseta Tony Stark",
+            //             "quantity" => "1",
+            //             "price_unit" => "130.00",
+            //             "code" => "1",
+            //             "sku_code" => "0001",
+            //             "extra" => "Informação Extra"
+            //         ]
+            //     ],
+            //     "transaction" => [
+            //         "available_payment_methods" => "2,3,4,5,6,7,14,15,16,18,19,21,22,23",
+            //         "customer_ip" => "127.0.0.1",
+            //         "shipping_type" => "Sedex",
+            //         "shipping_price" => "12",
+            //         "price_discount" => "",
+            //         "url_notification" => "http://www.loja.com.br/notificacao",
+            //         "free" => "Campo Livre"
+            //     ],
+            //     "transaction_trace" => [
+            //         "estimated_date" => "02/04/2022"
+            //     ],
+            //     "payment" => [
+            //         "payment_method_id" => "3",
+            //         "card_name" => "STEPHEN STRANGE",
+            //         "card_number" => "4111111111111111",
+            //         "card_expdate_month" => "12",
+            //         "card_expdate_year" => "2022",
+            //         "card_cvv" => "644",
+            //         "split" => "1"
+            //     ]
+            // ];
 
-            $this->setRules($fakePaymentData);
+            $this->setRules($transaction);
 
             $this->url_environment .= 'transactions/payment';
             $transaction['finger_print'] = $this->finger_print;
             $transaction['token'] = $this->token;
 
             // $body = Body::json($transaction);
-            $body = Body::json($fakePaymentData);
+            $body = Body::json($transaction);
 
             $request = new Request($this->url_environment, RequestMethod::POST, [], $body);
 
@@ -136,7 +138,12 @@ class Transaction implements Parser
 
             $messageErrorResponse = $this->getCodeMessage($codeResponse);
 
-            if (!$messageErrorResponse) $bodyResponseParsed = $this->getBodyResponse($bodyResponse);
+            if (!$messageErrorResponse) {
+                $this->message = $messageErrorResponse;
+                $bodyResponseParsed = $this->getBodyResponse($bodyResponse);
+            }
+
+            $this->code = $codeResponse;
 
             return [
                 "code" => $bodyStatusCodeResponse,
@@ -590,6 +597,24 @@ class Transaction implements Parser
             $responseParsed['transaction_id'] = $bodyResponse->data_response->transaction->payment->transaction_id ?? 0.0;
 
             return $responseParsed;
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    private function getReturnCode($code)
+    {
+        try {
+            return $this->code;
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    private function getReturnMessage($message)
+    {
+        try {
+            return $this->message;
         } catch (Exception $exception) {
             throw $exception;
         }
