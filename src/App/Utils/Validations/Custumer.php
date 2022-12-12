@@ -19,7 +19,7 @@ class Custumer
     static function cpf($data = "")
     {
         try {
-            if ($data === "" || $data <= 0) throw new Exception('Custumer 001 - The CPF value is invalid, string or number is accepted');
+            if ($data === "") throw new Exception('Custumer 001 - The CPF value is invalid, string or number is accepted');
 
             $cpfRaw = trim($data);
             $cpfCleared = preg_replace('/[^0-9]/', '', $cpfRaw);
