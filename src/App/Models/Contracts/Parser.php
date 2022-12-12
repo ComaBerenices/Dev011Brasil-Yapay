@@ -1,6 +1,6 @@
 <?php
 
-namespace Dev011Brasil\App\Models\Contracts\Error;
+namespace Dev011Brasil\App\Models\Contracts\Parser;
 
 interface Parser
 {
