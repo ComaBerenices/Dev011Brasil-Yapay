@@ -355,7 +355,7 @@ class Transaction implements Parser
     public function getCodeMessage($codeError = -1)
     {
         try {
-            $message = "";
+            $message = null;
             $code = -1;
 
             switch ($codeError) {
@@ -536,10 +536,12 @@ class Transaction implements Parser
                     $message = 'Transação inválida ou inexistente';
                     break;
                 default:
-                    $message = "Something don't work";
+                    $message = null;
             }
 
-            return "$code - $message";
+            $messageMounted = $message ? "$code - $message" : $message;
+
+            return $messageMounted;
         } catch (Exception $exception) {
             throw $exception;
         }
