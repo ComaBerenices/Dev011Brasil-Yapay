@@ -121,14 +121,14 @@ class Transaction implements Parser
             $codeResponse = "";
             $bodyResponseParsed = [];
 
-            if (property_exists('error_response', $bodyResponse)) {
+            if (property_exists($bodyResponse, 'error_response')) {
                 $codeResponse = $bodyResponse->error_response->general_errors[0]->code ?? "-1";
             } else if (
-                property_exists('data_response', $bodyResponse)
+                property_exists($bodyResponse, 'data_response')
                 &&
-                property_exists('transaction', $bodyResponse->data_response)
+                property_exists($bodyResponse->data_response, 'transaction')
                 &&
-                property_exists('payment', $bodyResponse->transaction)
+                property_exists($bodyResponse->transaction, 'payment')
             ) {
                 $codeResponse = $bodyResponse->data_response->transaction->payment->payment_response_code ?? "-1";
             }
