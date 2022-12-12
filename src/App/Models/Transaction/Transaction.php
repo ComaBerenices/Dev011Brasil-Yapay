@@ -24,7 +24,7 @@ class Transaction implements Parser
     {
         $this->token = $token;
         $this->finger_print = $finger_print;
-        $this->url_environment = $url_environment . 'transactions/payment';
+        $this->url_environment = $url_environment;
         $this->httpClient = new \Unirest\HttpClient();
     }
 
@@ -33,7 +33,7 @@ class Transaction implements Parser
      * @param Array $transaction The payment data
      * @return Response The response from Yapay services
      */
-    public function setTransaction($transaction = [])
+    public function pay($transaction = [])
     {
         try {
             $fakePaymentData = [
@@ -101,11 +101,74 @@ class Transaction implements Parser
 
             $this->setRules($fakePaymentData);
 
+            $this->url_environment .= 'transactions/payment';
             $transaction['finger_print'] = $this->finger_print;
             $transaction['token'] = $this->token;
 
             // $body = Body::json($transaction);
             $body = Body::json($fakePaymentData);
+
+            $request = new Request($this->url_environment, RequestMethod::POST, [], $body);
+
+            if (!$this->httpClient) throw new Exception('Something is wrong, Try Again!');
+
+            $response = $this->httpClient->execute($request);
+
+            if (!$response) throw new Exception("Something don't work correctly");
+
+            $bodyResponse = $response->getBody();
+            $bodyStatusCodeResponse = $response->getStatusCode();
+            $messageErrorResponse = null;
+            $codeResponse = "";
+            $bodyResponseParsed = [];
+
+            if (property_exists($bodyResponse, 'error_response')) {
+                $codeResponse = $bodyResponse->error_response->general_errors[0]->code ?? "-1";
+            } else if (
+                property_exists($bodyResponse, 'data_response')
+                &&
+                property_exists($bodyResponse->data_response, 'transaction')
+                &&
+                property_exists($bodyResponse->transaction, 'payment')
+            ) {
+                $codeResponse = $bodyResponse->data_response->transaction->payment->payment_response_code ?? "-1";
+            }
+
+            $messageErrorResponse = $this->getCodeMessage($codeResponse);
+
+            if (!$messageErrorResponse) $bodyResponseParsed = $this->getBodyResponse($bodyResponse);
+
+            return [
+                "code" => $bodyStatusCodeResponse,
+                "message" => $messageErrorResponse ?? 'Solicitação de transação efetuada',
+                "data" => $bodyResponseParsed
+            ];
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    /**
+     * Refund the transaction by transaction_id
+     * @see https://intermediador.dev.yapay.com.br/#/api-cancelar-transacao
+     * @param String $transactionID  The transaction ID
+     * @return Response The response from Yapay services
+     */
+    public function refundByID($transactionID = null)
+    {
+        try {
+
+            if (!$transactionID) throw new Exception();
+
+            $this->url_environment .= 'transactions/cancel';
+
+            $transaction['finger_print'] = $this->finger_print;
+            $transaction['token'] = $this->token;
+
+            $body = Body::json([
+                "access_token" => $this->token,
+                "transaction_id" => 79717
+            ]);
 
             $request = new Request($this->url_environment, RequestMethod::POST, [], $body);
 
@@ -467,6 +530,10 @@ class Transaction implements Parser
                 case '003039';
                     $code = '003039';
                     $message = 'Vendedor inválido ou não encontrado';
+                    break;
+                case '003005';
+                    $code = '003005';
+                    $message = 'Transação inválida ou inexistente';
                     break;
                 default:
                     $message = "Something don't work";
