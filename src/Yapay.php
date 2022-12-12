@@ -10,7 +10,9 @@ class Yapay
     protected $token = null;
     protected $finger_print = null;
     protected $url_environment = null;
+
     public $production = false;
+    public $transaction = null;
 
     public function __construct($token, $finger_print, $production)
     {
@@ -55,7 +57,11 @@ class Yapay
 
             $transaction = new Transaction($this->token, $this->finger_print, $this->url_environment);
 
-            return $transaction->pay($body);
+            $transactionResponse = $transaction->pay($body);
+
+            $this->transaction  = $transaction;
+
+            return $transactionResponse;
         } catch (Exception $exception) {
             throw $exception;
         }
