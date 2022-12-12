@@ -121,16 +121,16 @@ class Transaction implements Parser
             $codeResponse = "";
             $bodyResponseParsed = [];
 
-            if (array_key_exists('error_response', $bodyResponse)) {
-                $codeResponse = $bodyResponse['error_response']['general_errors'][0]['code'] ?? "-1";
+            if (property_exists('error_response', $bodyResponse)) {
+                $codeResponse = $bodyResponse->error_response->general_errors[0]->code ?? "-1";
             } else if (
-                array_key_exists('data_response', $bodyResponse)
+                property_exists('data_response', $bodyResponse)
                 &&
-                array_key_exists('transaction', $bodyResponse['data_response'])
+                property_exists('transaction', $bodyResponse->data_response)
                 &&
-                array_key_exists('payment', $bodyResponse['transaction'])
+                property_exists('payment', $bodyResponse->transaction)
             ) {
-                $codeResponse = $bodyResponse['data_response']['transaction']['payment']['payment_response_code'] ?? "-1";
+                $codeResponse = $bodyResponse->data_response->transaction->payment->payment_response_code ?? "-1";
             }
 
             $messageErrorResponse = $this->getCodeMessage($codeResponse);
@@ -478,12 +478,12 @@ class Transaction implements Parser
         }
     }
 
-    public function getBodyResponse($bodyResponse = [])
+    public function getBodyResponse($bodyResponse = null)
     {
         try {
             if (count($bodyResponse) <= 0) throw new Exception("Transaction 174 - The response body is invalid");
 
-            $paymentMethodID = $bodyResponse['data_response']['transaction']['payment']['payment_response_code'] ?? -1;
+            $paymentMethodID = $bodyResponse->data_response->transaction->payment->payment_response_code ?? -1;
 
             $responseParsed = [
                 "price_payment" => 0.0,
@@ -498,27 +498,27 @@ class Transaction implements Parser
 
             switch ($paymentMethodID) {
                 case 27:
-                    $responseParsed['url_payment'] = $bodyResponse['data_response']['transaction']['payment']['url_payment'] ?? '';
-                    $responseParsed['qrcode_path']  = $bodyResponse['data_response']['transaction']['payment']['qrcode_path'] ?? '';
-                    $responseParsed['qrcode_original_path']  = $bodyResponse['data_response']['transaction']['payment']['qrcode_original_path'] ?? '';
+                    $responseParsed['url_payment'] = $bodyResponse->data_response->transaction->payment->url_payment ?? '';
+                    $responseParsed['qrcode_path']  = $bodyResponse->data_response->transaction->payment->qrcode_path ?? '';
+                    $responseParsed['qrcode_original_path']  = $bodyResponse->data_response->transaction->payment->qrcode_original_path ?? '';
                     $responseParsed['payment']  = 'PIX';
 
                     break;
                 case 6:
-                    $responseParsed['url_payment'] = $bodyResponse['data_response']['transaction']['payment']['url_payment'] ?? '';
+                    $responseParsed['url_payment'] = $bodyResponse->data_response->transaction->payment->url_payment ?? '';
                     $responseParsed['payment']  = 'Boleto';
                     break;
                 default:
                     //
             }
 
-            $responseParsed['price_payment'] = $bodyResponse['data_response']['transaction']['payment']['price_payment'] ?? 0.0;
-            $responseParsed['price_original'] = $bodyResponse['data_response']['transaction']['payment']['price_original'] ?? 0.0;
+            $responseParsed['price_payment'] = $bodyResponse->data_response->transaction->payment->price_payment ?? 0.0;
+            $responseParsed['price_original'] = $bodyResponse->data_response->transaction->payment->price_original ?? 0.0;
 
-            $responseParsed['status_id'] = $bodyResponse['data_response']['transaction']['payment']['status_id'] ?? 0.0;
-            $responseParsed['status_name'] = $bodyResponse['data_response']['transaction']['payment']['status_name'] ?? 0.0;
-            $responseParsed['order_number'] = $bodyResponse['data_response']['transaction']['payment']['order_number'] ?? 0.0;
-            $responseParsed['transaction_id'] = $bodyResponse['data_response']['transaction']['payment']['transaction_id'] ?? 0.0;
+            $responseParsed['status_id'] = $bodyResponse->data_response->transaction->payment->status_id ?? 0.0;
+            $responseParsed['status_name'] = $bodyResponse->data_response->transaction->payment->status_name ?? 0.0;
+            $responseParsed['order_number'] = $bodyResponse->data_response->transaction->payment->order_number ?? 0.0;
+            $responseParsed['transaction_id'] = $bodyResponse->data_response->transaction->payment->transaction_id ?? 0.0;
 
             return $responseParsed;
         } catch (Exception $exception) {
