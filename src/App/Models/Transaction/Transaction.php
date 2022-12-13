@@ -671,4 +671,13 @@ class Transaction implements Parser
             throw $exception;
         }
     }
+
+    public function getPaymentStatement()
+    {
+        try {
+            return $this;
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
 }
